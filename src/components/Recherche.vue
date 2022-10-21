@@ -3,16 +3,18 @@ import { ref } from 'vue'
 import moment from 'moment'
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
+import Autocomplete from './Autocomplete.vue';
 
 moment.locale('fr')
 
-
 let champsCoord = []
-let rechercheResultsDepart = ref()
-let rechercheResultsArrivee = ref()
+// let rechercheResultsDepart = ref()
+// let rechercheResultsArrivee = ref()
 let journeys = ref()
 let links = ref()
 let rechercheDate = ref()
+let rechercheDepart = ref()
+let rechercheArrivee = ref()
 
 
 await fetch("https://ressources.data.sncf.com/api/records/1.0/search/?dataset=referentiel-gares-voyageurs&q=&rows=10000")
@@ -25,19 +27,8 @@ await fetch("https://ressources.data.sncf.com/api/records/1.0/search/?dataset=re
 
 let gares = [...new Set(champsCoord.map(obj => obj.name))] // unique list
 
-// console.log(gares)
-
-// makeRequest(2.373520, 48.844888, -0.556697, 44.825873, moment().format())
-
 function makeRequest(urlOptional, startLong, startLat, endLong, endLat, date) {
-    let url = ""
-    if(urlOptional){
-        url = urlOptional
-    } else {
-
-        url = `https://api.sncf.com/v1/coverage/sncf/journeys?from=${startLong};${startLat}&to=${endLong};${endLat}&datetime_represents=departure&datetime=${date}`
-    }
-
+    let url = urlOptional ? urlOptional : `https://api.sncf.com/v1/coverage/sncf/journeys?from=${startLong};${startLat}&to=${endLong};${endLat}&datetime_represents=departure&datetime=${date}`
     console.log(url)
     fetch(url, {
         headers: new Headers({
@@ -52,55 +43,8 @@ function makeRequest(urlOptional, startLong, startLat, endLong, endLat, date) {
 }
 
 function nextDeparture(precedent) {
-    let url = ""
-    if (precedent == 'precedent') {
-        url = links.value[1].href
-    } else [
-        url = links.value[0].href
-    ]
-
+    let url = precedent ? links.value[1].href : links.value[0].href
     makeRequest(url)
-}
-
-
-function autocompleteMatch(input) {
-    if (input == '' || input.length < 3) {
-        return [];
-    }
-    return [...gares]
-        .filter((str) =>
-            str.toLowerCase().includes(input.toLowerCase())
-        )
-}
-
-function showResults(val, depart, hide) {
-    if(depart == "depart") {
-        if(hide == "hide") {
-            rechercheResultsDepart.value = autocompleteMatch('');
-        } else {
-            rechercheResultsDepart.value = autocompleteMatch(val);
-        }
-    } else {
-        if(hide == "hide") {
-            rechercheResultsArrivee.value = autocompleteMatch('');
-        } else {
-        rechercheResultsArrivee.value = autocompleteMatch(val);
-        }
-    }
-}
-
-function handleAutoComplete(value, depart) {
-    if(depart == "depart") {
-        this.rechercheDepart = value
-        showResults(this.rechercheDepart, 'depart', 'hide')
-    } else {
-
-        this.rechercheArrivee = value
-        showResults(this.rechercheArrivee)
-        showResults(this.rechercheDepart, 'arrivee', 'hide')
-
-    }
-
 }
 
 function preProcessRequest(depart, arrivee, date) {
@@ -122,36 +66,13 @@ function preProcessRequest(depart, arrivee, date) {
     <div class="mainContainer">
         <form autocomplete="off" class="mainForm">
         <div class="mainFormContainer">
-
-            <div class="gareDepart">
-                <input id="gareInputDepart" class="gareInput" v-model="rechercheDepart" placeholder="Gare de départ"
-                    @keyup ="showResults(rechercheDepart, 'depart')" />
-
-                <ul v-for="result in rechercheResultsDepart" @click="handleAutoComplete(result, 'depart'); ">
-                    {{result}}
-                </ul>
-
-            </div>
-
-            <div class="gareArrivee">
-                <input id="gareInputArrivee" class="gareInput" v-model="rechercheArrivee" placeholder="Gare d'arrivée"
-                    @keyup="showResults(rechercheArrivee)" />
-
-                <ul v-for="result in rechercheResultsArrivee" @click="handleAutoComplete(result); ">
-                    {{result}}
-                </ul>
-
-            </div>
-
-            
+            <Autocomplete ref="rechercheDepart" :gares="gares" placeHolder="Gare de départ"/>
+            <Autocomplete ref="rechercheArrivee" :gares="gares" placeHolder="Gare d'arrivée"/>
         </div>
-        
         <Datepicker class="datePicker" v-model="rechercheDate" placeholder="Date de départ" :dark=true format='dd/MM/yyyy HH:mm'></Datepicker>
-        <input class="submitButton" type="submit" value="Rechercher" @click.prevent="preProcessRequest(rechercheDepart, rechercheArrivee, rechercheDate)"/>
+        <input class="submitButton" type="submit" value="Rechercher" @click.prevent="preProcessRequest(rechercheDepart.recherche, rechercheArrivee.recherche, rechercheDate)"/>
     </form>
-    
-    
-    
+
     <div class="results" v-if="journeys">
         {{journeys[0].sections.length}} Étapes <br/> 
         Date de départ : {{moment(journeys[0].departure_date_time).format('D MMM HH:mm')}} <br/> 
@@ -182,57 +103,9 @@ function preProcessRequest(depart, arrivee, date) {
     justify-content: space-evenly;
     width: 100%;
 }
-.gareDepart {
-    background-color: #2b2a33;
-    display: flex;
-    flex-direction: column;
-    justify-content: left;
-    width: 40%;
-    height: min-content;
-    border-radius: 5px;
-    border: 1px solid grey;
-
-}
-.gareArrivee {
-    background-color: #2b2a33;
-    display: flex;
-    flex-direction: column;
-    justify-content: left;
-    width: 40%;
-    height: min-content;
-    border-radius: 5px;
-    border: 1px solid grey;
-
-}
-
-.gareInput {
-    padding: 15px;
-    border-radius: 5px;
-    /* border: 1px solid gray; */
-    border: none;
-    font-size: larger;
-}
 
 .nextButton{
     width: min-content;
-}
-
-ul {
-    padding: 0px;
-    padding-left: 15px;
-    padding-top: 7px;
-    padding-bottom: 7px;
-    margin: 0px;
-    border-top: 1px solid grey;
-    cursor: pointer;
-    opacity: 0.5;
-    /* color: #213547; */
-}
-ul:hover{
-    background-color: rgb(69, 136, 99);
-}
-ul:last-child{
-    padding-bottom: 10px;
 }
 .submitButton{
     margin-top: 50px;
@@ -245,8 +118,9 @@ ul:last-child{
     color: #213547;
 }
 
-input:focus{
-    outline: none;
+.submitButton:hover{
+    background-color: #2E855E;
+    transition: all .1s ease-in;
 }
 
 .datePicker{
