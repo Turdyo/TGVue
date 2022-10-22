@@ -4,12 +4,11 @@ import moment from 'moment'
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import Autocomplete from './Autocomplete.vue';
+import Journey from './Journey.vue';
 
 moment.locale('fr')
 
-let champsCoord = []
-// let rechercheResultsDepart = ref()
-// let rechercheResultsArrivee = ref()
+let garesCoord = []
 let journeys = ref()
 let links = ref()
 let rechercheDate = ref()
@@ -20,12 +19,13 @@ let rechercheArrivee = ref()
 await fetch("https://ressources.data.sncf.com/api/records/1.0/search/?dataset=referentiel-gares-voyageurs&q=&rows=10000")
     .then((response) => response.json())
     .then((json) => {
-        champsCoord = json.records.map(element => {
+        garesCoord = json.records.map(element => {
             return { "geometry": element.geometry, "name": `${element.fields.gare_alias_libelle_noncontraint}` }
         })
     })
 
-let gares = [...new Set(champsCoord.map(obj => obj.name))] // unique list
+let gares = [...new Set(garesCoord.map(obj => obj.name))] // unique list
+
 
 function makeRequest(urlOptional, startLong, startLat, endLong, endLat, date) {
     let url = urlOptional ? urlOptional : `https://api.sncf.com/v1/coverage/sncf/journeys?from=${startLong};${startLat}&to=${endLong};${endLat}&datetime_represents=departure&datetime=${date}`
@@ -42,24 +42,21 @@ function makeRequest(urlOptional, startLong, startLat, endLong, endLat, date) {
         })
 }
 
+function preProcessRequest(depart, arrivee, date) {
+    
+    let startLat = garesCoord.find(gare => gare.name == depart).geometry.coordinates[0]
+    let startLong = garesCoord.find(gare => gare.name == depart).geometry.coordinates[1]    
+    
+    let endLat = garesCoord.find(gare => gare.name == arrivee).geometry.coordinates[0]
+    let endLong = garesCoord.find(gare => gare.name == arrivee).geometry.coordinates[1]
+    
+    makeRequest(false, startLat, startLong, endLat, endLong, moment(date).format('YMDTHHmm'))
+}
+
 function nextDeparture(precedent) {
     let url = precedent ? links.value[1].href : links.value[0].href
     makeRequest(url)
 }
-
-function preProcessRequest(depart, arrivee, date) {
-
-    let startLat = champsCoord.find(gare => gare.name == depart).geometry.coordinates[0]
-    let startLong = champsCoord.find(gare => gare.name == depart).geometry.coordinates[1]    
-
-    let endLat = champsCoord.find(gare => gare.name == arrivee).geometry.coordinates[0]
-    let endLong = champsCoord.find(gare => gare.name == arrivee).geometry.coordinates[1]
-
-    makeRequest(false, startLat, startLong, endLat, endLong, moment(date).format('YMDTHHmm'))
-}
-
-
-
 </script>
 
 <template>
@@ -73,11 +70,10 @@ function preProcessRequest(depart, arrivee, date) {
         <input class="submitButton" type="submit" value="Rechercher" @click.prevent="preProcessRequest(rechercheDepart.recherche, rechercheArrivee.recherche, rechercheDate)"/>
     </form>
 
+
     <div class="results" v-if="journeys">
-        {{journeys[0].sections.length}} Étapes <br/> 
-        Date de départ : {{moment(journeys[0].departure_date_time).format('D MMM HH:mm')}} <br/> 
-        Date d'arrivée : {{moment(journeys[0].arrival_date_time).format('D MMM HH:mm')}} <br/>
-        Durée : {{moment.utc(journeys[0].duration*1000).format('HH:mm')}}
+        <Journey :journey="journeys[0]"/>
+        
         <div class="navButtons">
 
             <div class="submitButton nextButton" @click="nextDeparture('precedent')">Train&nbsp;Précédent</div>
@@ -89,6 +85,7 @@ function preProcessRequest(depart, arrivee, date) {
 </template>
 
 <style scoped>
+
 .mainContainer{
     display: flex;
     flex-direction: column;
@@ -137,5 +134,26 @@ function preProcessRequest(depart, arrivee, date) {
     justify-content: space-evenly;
 }
 
+.dp__theme_dark {
+   --dp-background-color: #2b2a33;
+   --dp-text-color: #ffffff;
+   --dp-hover-color: #484848;
+   --dp-hover-text-color: #ffffff;
+   --dp-hover-icon-color: #959595;
+   --dp-primary-color: #005cb2;
+   --dp-primary-text-color: #ffffff;
+   --dp-secondary-color: #a9a9a9;
+   --dp-border-color: #808080;
+   --dp-menu-border-color: #808080;
+   --dp-border-color-hover: #aaaeb7;
+   --dp-disabled-color: #737373;
+   --dp-scroll-bar-background: #212121;
+   --dp-scroll-bar-color: #484848;
+   --dp-success-color: #00701a;
+   --dp-success-color-disabled: #428f59;
+   --dp-icon-color: #959595;
+   --dp-danger-color: #e53935;
+   --dp-highlight-color: rgba(0, 92, 178, 0.2);
+}
 
 </style>

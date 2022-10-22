@@ -1,5 +1,7 @@
 <script setup>
 import { ref } from 'vue'
+import Fuse from 'fuse.js'
+
 
 let props = defineProps({
     gares: {
@@ -12,8 +14,14 @@ let props = defineProps({
     }
 })
 
+const fuseOptions = {
+    includeScore: true,
+    minMatchCharLength: 3
+}
+
 let recherche = ref()
 let rechercheResults = ref()
+const fuse = new Fuse(props.gares, fuseOptions)
 
 defineExpose({
     recherche
@@ -22,21 +30,12 @@ defineExpose({
 
 function showResults(val, hide) {
     if (hide == "hide") {
-        rechercheResults.value = autocompleteMatch('');
+        rechercheResults.value = [];
     } else {
-        rechercheResults.value = autocompleteMatch(val);
+        rechercheResults.value = fuse.search(val).filter(search => search.score < 0.5).map(search => search.item).slice(0, 10);
     }
 }
 
-
-function autocompleteMatch(input) {
-    if (input == '' || input.length < 3) {
-        return [];
-    }
-    return props.gares.filter((str) =>
-        str.toLowerCase().includes(input.toLowerCase())
-    )
-}
 
 function handleAutoComplete(value) {
     recherche.value = value
@@ -47,7 +46,7 @@ function handleAutoComplete(value) {
 
 <template>
     <div class="gareDepart">
-        <input id="gareInputDepart" class="gareInput" v-model="recherche" :placeholder="props.placeHolder"
+        <input class="gareInput" v-model="recherche" :placeholder="props.placeHolder"
             @keyup="showResults(recherche)" />
 
         <ul v-for="result in rechercheResults" @click="handleAutoComplete(result); ">
@@ -75,6 +74,7 @@ function handleAutoComplete(value) {
     border-radius: 5px;
     border: none;
     font-size: larger;
+    background-color: #2b2a33;
 }
 
 ul {
