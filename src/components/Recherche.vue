@@ -5,15 +5,19 @@ import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import Autocomplete from './Autocomplete.vue';
 import Journey from './Journey.vue';
+import Journeys from './Journeys.vue';
 
 moment.locale('fr')
 
 let garesCoord = []
-let journeys = ref()
+let journeys = ref([])
+let resultsLoading = ref(false)
+let resultsReady = ref(false)
 let links = ref()
 let rechercheDate = ref()
 let rechercheDepart = ref()
 let rechercheArrivee = ref()
+
 
 
 await fetch("https://ressources.data.sncf.com/api/records/1.0/search/?dataset=referentiel-gares-voyageurs&q=&rows=10000")
@@ -23,6 +27,7 @@ await fetch("https://ressources.data.sncf.com/api/records/1.0/search/?dataset=re
             return { "geometry": element.geometry, "name": `${element.fields.gare_alias_libelle_noncontraint}` }
         })
     })
+    .catch((error) => console.log(error));
 
 let gares = [...new Set(garesCoord.map(obj => obj.name))] // unique list
 
@@ -30,33 +35,54 @@ let gares = [...new Set(garesCoord.map(obj => obj.name))] // unique list
 function makeRequest(urlOptional, startLong, startLat, endLong, endLat, date) {
     let url = urlOptional ? urlOptional : `https://api.sncf.com/v1/coverage/sncf/journeys?from=${startLong};${startLat}&to=${endLong};${endLat}&datetime_represents=departure&datetime=${date}`
     console.log(url)
-    fetch(url, {
+    return fetch(url, {
         headers: new Headers({
             'Authorization': 'b71612e2-708e-45e9-9880-790a6617049a'
         })
     })
         .then(response => response.json())
         .then(json => {
-            journeys.value = json.journeys
+            journeys.value.push(json.journeys.filter(journey => journey.type === "best")[0])
             links.value = json.links
         })
+        .catch((error) => console.log(error));
 }
 
-function preProcessRequest(depart, arrivee, date) {
-    
+async function preProcessRequest(depart, arrivee, date) {
+    journeys.value = []
+    resultsLoading.value = true
+    resultsReady.value = false
+
     let startLat = garesCoord.find(gare => gare.name == depart).geometry.coordinates[0]
     let startLong = garesCoord.find(gare => gare.name == depart).geometry.coordinates[1]    
-    
     let endLat = garesCoord.find(gare => gare.name == arrivee).geometry.coordinates[0]
     let endLong = garesCoord.find(gare => gare.name == arrivee).geometry.coordinates[1]
-    
-    makeRequest(false, startLat, startLong, endLat, endLong, moment(date).format('YMDTHHmm'))
+
+    await makeRequest(false, startLat, startLong, endLat, endLong, moment(date).format('YMDTHHmm'))
+    await makeRequest(links.value[0].href)
+    await makeRequest(links.value[0].href)
+    await makeRequest(links.value[0].href)
+    await makeRequest(links.value[0].href)
+    resultsLoading.value = false
+    resultsReady.value = true
 }
 
-function nextDeparture(precedent) {
-    let url = precedent ? links.value[1].href : links.value[0].href
-    makeRequest(url)
+
+async function nextDeparture(precedent) {
+    journeys.value = []
+    
+    resultsLoading.value = true
+    resultsReady.value = false
+
+    for(let i = 0; i <5; i++) {
+        let url = precedent ? links.value[1].href : links.value[0].href
+        await makeRequest(url)
+    }
+    resultsLoading.value = false
+    resultsReady.value = true
 }
+
+
 </script>
 
 <template>
@@ -66,25 +92,34 @@ function nextDeparture(precedent) {
             <Autocomplete ref="rechercheDepart" :gares="gares" placeHolder="Gare de départ"/>
             <Autocomplete ref="rechercheArrivee" :gares="gares" placeHolder="Gare d'arrivée"/>
         </div>
-        <Datepicker class="datePicker" v-model="rechercheDate" placeholder="Date de départ" :dark=true format='dd/MM/yyyy HH:mm'></Datepicker>
+        <Datepicker class="datePicker" v-model="rechercheDate" placeholder="Maintenant" :dark=true format='dd/MM/yyyy HH:mm'></Datepicker>
         <input class="submitButton" type="submit" value="Rechercher" @click.prevent="preProcessRequest(rechercheDepart.recherche, rechercheArrivee.recherche, rechercheDate)"/>
     </form>
 
+        <div v-if="resultsLoading" class="loading">
+            <img src="https://cdn.dribbble.com/users/1305855/screenshots/5945198/loading_800-600.gif" class="loadingImg loadingImgRecherche">
+        </div>
 
-    <div class="results" v-if="journeys">
-        <Journey :journey="journeys[0]"/>
-        
-        <div class="navButtons">
-
-            <div class="submitButton nextButton" @click="nextDeparture('precedent')">Train&nbsp;Précédent</div>
-            <div class="submitButton nextButton" @click="nextDeparture()">Train&nbsp;Suivant</div>
+        <div class="results" v-if="resultsReady"> 
+            <Journeys :journeys="journeys" />
+            <div class="navButtons">
+                <!-- <div class="submitButton nextButton" @click="nextDeparture('precedent')">Trains&nbsp;Précédents</div> -->
+                <div class="submitButton nextButton" @click="nextDeparture()">Trains&nbsp;Suivants</div>
+            </div>
         </div>
     </div>
-    
-</div>
 </template>
 
 <style scoped>
+.loading{
+    display: flex; 
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.loadingImgRecherche{
+    width: 300px;
+}
 
 .mainContainer{
     display: flex;
