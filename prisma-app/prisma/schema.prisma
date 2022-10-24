@@ -23,8 +23,8 @@ model Ticket {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   start_station String
   end_station String
-  date String
-  price Float @default(1.00)
+  date DateTime
+  price Float @default(10.00)
   owner User @relation(fields: [ownerId], references: [id]) // Create the relation between a ticket and its owner.
   ownerId String
 }
