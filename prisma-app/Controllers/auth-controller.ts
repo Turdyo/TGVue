@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 export function getToken(req: { headers: { [x: string]: any; }; }) {
     const authorization = req.headers["authorization"];
     if (authorization === undefined) return null;
-    return authorization.replace("Bearer ", "");
+    return authorization.replace("Bearer ", "").replace("Token ", "");
 }
 
 export const createNewAccount = (req: any, res: any) => {

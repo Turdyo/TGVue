@@ -1,12 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import express from 'express';
 import { getUserData, setNewPassword, addTicketToUser, deleteAccount } from './Controllers/user-controller'
 import { createNewAccount, login } from './Controllers/auth-controller';
 
-const prisma = new PrismaClient();
 const app = express();
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs')
 
 app.use(express.json());
 
@@ -15,7 +11,6 @@ app.get('api/users/:id', (req, res) => getUserData(req, res));
 app.put('api/users/:id/updatePwd', async (req, res) => setNewPassword(req, res));
 
 app.post('api/users/:id/addTicket',  (req, res) => addTicketToUser(req, res));
-
 
 // Delete tickets first and user then to prevent any issue
 app.delete('api/users/:id/deleteAccount', (req, res) => deleteAccount(req, res))
