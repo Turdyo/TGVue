@@ -53,6 +53,26 @@ app.post('/users/:id/updatePwd', async (req, res) => {
   })
 });
 
+app.post('/users/:id/addTicket',async (req, res) => {
+  const { id } = req.params;
+  const body = req.body;
+
+  prisma.ticket.create({
+    data:{
+      ownerId: String(id),
+      start_station: body.start_station,
+      end_station: body.end_station,
+      price: body.price,
+      date: body.date
+    }
+  })
+  .then(response => res.json(response))
+  .catch(e => {
+    console.log(e);
+    res.json({"error":"Something went wrong..."})
+  });
+});
+
 app.post('/createUser', async (req, res) => {
   const body = req.body;
 
