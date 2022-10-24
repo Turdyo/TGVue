@@ -8,6 +8,7 @@ app.use(express.json());
 
 app.get('/users/:id', async (req, res) => {
   const { id } = req.params;
+
   prisma.user.findUnique({
     where:{
       id: String(id),
@@ -29,14 +30,32 @@ app.get('/users/:id', async (req, res) => {
   .then(user => res.json(user))
   .catch(e => {
     console.log(e);
+    res.json({"error":"Something went wrong..."})
   });
-  
+});
+
+app.post('/users/:id/updatePwd', async (req, res) => {
+  const { id } = req.params;
+  const newPwd = req.body.password;
+
+  prisma.user.update({
+    where: {
+      id: String(id),
+    },
+    data: {
+      password: newPwd
+    }
+  })
+  .then(response => res.json(response))
+  .catch(e => {
+    console.log(e);
+    res.json({"error":"Something went wrong..."})
+  })
 });
 
 app.post('/createUser', async (req, res) => {
   const body = req.body;
-  console.log(body);
-  
+
   prisma.user.create({
     data: {
       email: body.email,
