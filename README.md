@@ -12,6 +12,7 @@
 The rest api of the project is an express server using the prisma ORM connected to a mongodb database.
 
 To run it, please enter the `prisma-app` folder and enter the command :
+> npm install
 > npm run dev
 
 ### Models
