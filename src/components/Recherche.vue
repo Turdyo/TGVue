@@ -45,6 +45,7 @@ function makeRequest(urlOptional, startLong, startLat, endLong, endLat, date) {
             journeys.value.push(json.journeys.filter(journey => journey.type === "best")[0])
             links.value = json.links
         })
+        .then()
         .catch((error) => console.log(error));
 }
 
@@ -111,6 +112,7 @@ async function nextDeparture(precedent) {
 </template>
 
 <style scoped>
+
 .loading{
     display: flex; 
     justify-content: center;
@@ -141,6 +143,7 @@ async function nextDeparture(precedent) {
 }
 .submitButton{
     margin-top: 50px;
+    margin-bottom: 50px;
     padding: 20px;
     font-size: large;
     cursor: pointer;

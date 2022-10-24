@@ -15,33 +15,38 @@ let props = defineProps({
 
 <template>
     <div v-if="props.journey" class="journeyContainer">
-        
-        <div class="dates">
-            <span class="dateIcon">
-                <img src="https://cdn-icons-png.flaticon.com/512/3501/3501843.png" alt="Date" class="waitingIcon">
-                {{moment(journey.departure_date_time).format('DD/MM')}}
-            </span>
-            <span class="heures">
-                <img src="https://cdn-icons-png.flaticon.com/512/3721/3721924.png" alt="Horloge" class="waitingIcon">
-                {{moment(journey.departure_date_time).format('HH:mm')}}
-                <i class="gg-arrow-down"></i>
-                {{moment(journey.arrival_date_time).format('HH:mm')}}
-            </span>
-        </div>
-
-        <div class="steps">
-            <div v-for='section in props.journey.sections.filter(section => section.type === "public_transport" || section.type === "waiting")' class="section">
-                <div v-if="section.type === 'waiting' ">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4388/4388350.png" alt="Attendre" class="waitingIcon">
-                    {{moment.utc(new Date(section.duration * 1000)).format("HH:mm")}}
-                </div>
-                <div v-else>
-                    <img src="https://cdn-icons-png.flaticon.com/512/2855/2855692.png" alt="Train" class="waitingIcon">
-                    {{moment.utc(new Date(section.duration * 1000)).format("HH:mm")}}&nbsp;{{section.from.name}} to {{section.to.name}}
+        <div class="datesSteps">
+            <div class="dates">
+                <span class="dateIcon">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3501/3501843.png" alt="Date" class="waitingIcon">
+                    {{moment(journey.departure_date_time).format('DD/MM')}}
+                </span>
+                <span class="heures">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3721/3721924.png" alt="Horloge" class="waitingIcon">
+                    {{moment(journey.departure_date_time).format('HH:mm')}}
+                    <i class="gg-arrow-down"></i>
+                    {{moment(journey.arrival_date_time).format('HH:mm')}}
+                </span>
+            </div>
     
+            <div class="steps">
+                <div v-for='section in props.journey.sections.filter(section => section.type === "public_transport" || section.type === "waiting")' class="section">
+                    <div v-if="section.type === 'waiting' ">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4388/4388350.png" alt="Attendre" class="waitingIcon">
+                        {{moment.utc(new Date(section.duration * 1000)).format("HH:mm")}}
+                    </div>
+                    <div v-else>
+                        <img src="https://cdn-icons-png.flaticon.com/512/2855/2855692.png" alt="Train" class="waitingIcon">
+                        {{moment.utc(new Date(section.duration * 1000)).format("HH:mm")}}&nbsp;{{section.from.name}} to {{section.to.name}}
+        
+                    </div>
                 </div>
+    
             </div>
 
+        </div>
+        <div class="reservation">
+            <button class="submitButton">Réserver</button>
         </div>
 
     </div>
@@ -54,6 +59,33 @@ let props = defineProps({
 </template>
 
 <style scoped>
+
+.datesSteps{
+    display: flex;
+}
+.reservation{
+    display: flex;
+    align-items: center;
+
+    margin-right: 50px;
+    height: auto;
+}
+.submitButton{
+    margin-top: 50px;
+    margin-bottom: 50px;
+    padding: 20px;
+    font-size: large;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    background-color: #42b883;
+    color: #213547;
+}
+
+.submitButton:hover{
+    background-color: #2E855E;
+    transition: all .1s ease-in;
+}
 .steps{
     display: flex;
     flex-direction: column;
@@ -74,6 +106,7 @@ let props = defineProps({
     padding: 20px;
     display: flex;
     margin-bottom: 10px;
+    justify-content: space-between;
     background-color: #2b2a33;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
