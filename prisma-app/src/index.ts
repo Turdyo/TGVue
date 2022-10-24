@@ -53,7 +53,7 @@ app.post('/users/:id/updatePwd', async (req, res) => {
   })
 });
 
-app.post('/users/:id/addTicket',async (req, res) => {
+app.post('/users/:id/addTicket', async (req, res) => {
   const { id } = req.params;
   const body = req.body;
 
@@ -72,6 +72,41 @@ app.post('/users/:id/addTicket',async (req, res) => {
     res.json({"error":"Something went wrong..."})
   });
 });
+
+
+// Delete tickets first and user then to prevent any issue
+app.delete('/users/:id/deleteAccount', async (req, res) => {
+  const { id } = req.params;
+
+  let deleteTicket = true;
+  let response = {"response":"User and tickets Deleted."};
+
+  await prisma.ticket.deleteMany({
+    where:{
+      ownerId: id
+    }
+  })
+  .catch(e => {
+    deleteTicket = false;
+    console.log(e);
+    response = {"response":"Deleting tickets : Something went wrong..."}
+  });
+
+  if(deleteTicket) {
+    await prisma.user.delete({
+      where:{
+        id: id
+      }
+    })
+    .catch(e => {
+      console.log(e);
+      response = {"response":"Deleting user : Something went wrong..."};
+    });
+  }
+
+  res.json(response);
+    
+})
 
 app.post('/createUser', async (req, res) => {
   const body = req.body;
