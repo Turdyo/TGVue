@@ -1,0 +1,30 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  email String @unique
+  lastName String?
+  firstName String?
+  password String
+  tickets Ticket[]
+}
+
+model Ticket {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  start_station String
+  end_station String
+  date DateTime
+  price Float @default(10.00)
+  owner User @relation(fields: [ownerId], references: [id]) // Create the relation between a ticket and its owner.
+  ownerId String
+}
