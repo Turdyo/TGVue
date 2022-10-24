@@ -86,21 +86,21 @@ async function nextDeparture(precedent) {
 </script>
 
 <template>
-    <div class="mainContainer">
+    <div v-auto-animate class="mainContainer">
         <form autocomplete="off" class="mainForm">
-        <div class="mainFormContainer">
-            <Autocomplete ref="rechercheDepart" :gares="gares" placeHolder="Gare de départ"/>
-            <Autocomplete ref="rechercheArrivee" :gares="gares" placeHolder="Gare d'arrivée"/>
-        </div>
-        <Datepicker class="datePicker" v-model="rechercheDate" placeholder="Maintenant" :dark=true format='dd/MM/yyyy HH:mm'></Datepicker>
-        <input class="submitButton" type="submit" value="Rechercher" @click.prevent="preProcessRequest(rechercheDepart.recherche, rechercheArrivee.recherche, rechercheDate)"/>
-    </form>
+            <div class="mainFormContainer">
+                <Autocomplete ref="rechercheDepart" :gares="gares" placeHolder="Gare de départ"/>
+                <Autocomplete ref="rechercheArrivee" :gares="gares" placeHolder="Gare d'arrivée"/>
+            </div>
+            <Datepicker class="datePicker" v-model="rechercheDate" placeholder="Maintenant" :dark=true format='dd/MM/yyyy HH:mm'></Datepicker>
+            <input class="submitButton" type="submit" value="Rechercher" @click.prevent="preProcessRequest(rechercheDepart.recherche, rechercheArrivee.recherche, rechercheDate)"/>
+        </form>
 
         <div v-if="resultsLoading" class="loading">
             <img src="https://cdn.dribbble.com/users/1305855/screenshots/5945198/loading_800-600.gif" class="loadingImg loadingImgRecherche">
         </div>
 
-        <div class="results" v-if="resultsReady"> 
+        <div v-if="resultsReady" class="results" >
             <Journeys :journeys="journeys" />
             <div class="navButtons">
                 <!-- <div class="submitButton nextButton" @click="nextDeparture('precedent')">Trains&nbsp;Précédents</div> -->

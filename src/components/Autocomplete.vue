@@ -45,11 +45,11 @@ function handleAutoComplete(value) {
 </script>
 
 <template>
-    <div class="gareDepart">
+    <div v-auto-animate class="gareDepart">
         <input class="gareInput" v-model="recherche" :placeholder="props.placeHolder"
             @keyup="showResults(recherche)" />
 
-        <ul v-for="result in rechercheResults" @click="handleAutoComplete(result); ">
+        <ul v-for="result in rechercheResults" @click="handleAutoComplete(result);">
             {{result}}
         </ul>
 

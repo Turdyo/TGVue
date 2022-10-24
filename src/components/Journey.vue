@@ -74,6 +74,8 @@ let props = defineProps({
     padding: 20px;
     display: flex;
     margin-bottom: 10px;
+    background-color: #2b2a33;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 .dates{
     display: flex;
