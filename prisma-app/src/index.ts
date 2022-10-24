@@ -1,8 +1,10 @@
-import { PrismaClient } from '@prisma/client'
-import express from 'express'
+import { PrismaClient } from '@prisma/client';
+import express from 'express';
 
-const prisma = new PrismaClient()
-const app = express()
+const prisma = new PrismaClient();
+const app = express();
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs')
 
 app.use(express.json());
 
@@ -89,7 +91,7 @@ app.delete('/users/:id/deleteAccount', async (req, res) => {
   .catch(e => {
     deleteTicket = false;
     console.log(e);
-    response = {"response":"Deleting tickets : Something went wrong..."}
+    response = {"response":"Deleting tickets : Something went wrong..."};
   });
 
   if(deleteTicket) {
@@ -105,7 +107,6 @@ app.delete('/users/:id/deleteAccount', async (req, res) => {
   }
 
   res.json(response);
-    
 })
 
 app.post('/createUser', async (req, res) => {
@@ -116,15 +117,48 @@ app.post('/createUser', async (req, res) => {
       email: body.email,
       lastName: body.lastName,
       firstName: body.firstName,
-      password: body.password
+      password: bcrypt.hashSync(body.password)
     }
   })
-  .then(newUser => res.json(newUser))
+  .then(user => res.status(200).json({
+    id: user.id,
+    token: jwt.sign(
+      { UserId: user.id, UserEmail: user.email, UserLast: user.lastName },
+      process.env.SECRET, // Carreful to create it in the prisma-app/.env
+      { expiresIn: 86400 }
+    )
+  }))
   .catch(e => {
     console.log(e)
-    res.json({"error":"Something went wrong..."})
+    res.status(500).json({"error":"Something went wrong..."})
   });
+})
 
+app.get('/login', async (req, res) => {
+  const body = req.body;
+
+  prisma.user.findUnique({
+    where:{
+      email: body.email
+    }
+  })
+  .then(user => {
+    if(!user) return res.status(401).json({error: "user not found"});
+    
+    bcrypt.compare(body.password, user.password)
+    .then((valid: any) => {
+      if(!valid) return res.status(401).json({error: "password incorrect"});
+      res.status(200).json({
+        id: user.id,
+        token: jwt.sign(
+          { UserId: user.id, UserEmail: user.email, UserLast: user.lastName },
+          process.env.SECRET, // Carreful to create it in the prisma-app/.env
+          { expiresIn: 86400 }
+        )
+      })
+    })
+    .catch((error: any) => res.status(500).json({ error }))
+  });
 })
 
 app.listen(3000, () =>
