@@ -37,7 +37,7 @@ function makeRequest(urlOptional, startLong, startLat, endLong, endLat, date) {
     console.log(url)
     return fetch(url, {
         headers: new Headers({
-            'Authorization': 'b71612e2-708e-45e9-9880-790a6617049a'
+            'Authorization': import.meta.env.VITE_API_KEY 
         })
     })
         .then(response => response.json())
