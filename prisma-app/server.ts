@@ -1,8 +1,10 @@
 import express from 'express';
 import { getUserData, setNewPassword, addTicketToUser, deleteAccount } from './Controllers/user-controller'
 import { createNewAccount, login } from './Controllers/auth-controller';
+var cors = require('cors')
 
 const app = express();
+app.use(cors())
 
 app.use(express.json()); // Parse data into json
 

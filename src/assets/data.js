@@ -78,7 +78,7 @@ export default {
     },
 
     async addTicket(start_station, end_station, price, date) {
-        return fetch(url + '/users/' + this.getUserId() + '/addTicket', {
+        return fetch(url + 'users/' + this.getUserId() + '/addTicket', {
             method:'POST',
             headers:{
                 'Content-Type':'application/json',
@@ -92,5 +92,10 @@ export default {
             })
         })
         .then(res => res.json());
+    },
+
+    async getUserData() {
+        return fetch(url + '/users/' + this.getUserId())
+        .then(res => res.json())
     }
 }
