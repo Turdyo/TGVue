@@ -12,7 +12,9 @@ export function getToken(req: { headers: { [x: string]: any; }; }) {
 
 export const createNewAccount = (req: any, res: any) => {
     const body = req.body;
-  
+
+    res.setHeader('content-type', 'application/json')
+
     prisma.user.create({
       data: {
         email: body.email,
@@ -38,6 +40,8 @@ export const createNewAccount = (req: any, res: any) => {
 export const login = (req: any, res: any) => {
     const body = req.body;
   
+    res.setHeader('content-type', 'application/json')
+
     prisma.user.findUnique({
       where:{
         email: body.email

@@ -7,6 +7,8 @@ const prisma = new PrismaClient();
 export const getUserData = (req: any, res: any) => {
     const { id } = req.params;
   
+    res.setHeader('content-type', 'application/json')
+
     const token = getToken(req);
     if(token !== null && jwt.verify(token, process.env.SECRET)) {
       prisma.user.findUnique({
@@ -40,6 +42,8 @@ export const setNewPassword = (req: any, res: any) => {
     const { id } = req.params;
     const newPwd = req.body.password;
   
+    res.setHeader('content-type', 'application/json')
+
     const token = getToken(req);
     if(token !== null && jwt.verify(token, process.env.SECRET)) {
         prisma.user.update({

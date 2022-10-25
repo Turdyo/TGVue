@@ -111,7 +111,7 @@ async function nextDeparture(precedent) {
     </div>
 </template>
 
-<style scoped>
+<style>
 
 .loading{
     display: flex; 
