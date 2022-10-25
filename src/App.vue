@@ -1,22 +1,20 @@
 <script setup>
 
-import Recherche from './components/Recherche.vue'
-import Header from './components/Header.vue';
-
 </script>
 
 <template>
-  <Header></Header>
-  <Suspense>
-    <Recherche></Recherche>
-    <template #fallback>
-      <div style="text-align:center; font-size: larger">
-        Chargement ...
-      </div>
-    </template>
-  </Suspense>
+    <router-view />
 </template>
 
-<style scoped>
-
+<style>
+#app {
+    width: 100vw;
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 </style>
+
+
