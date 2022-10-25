@@ -82,20 +82,35 @@ export default {
             method:'POST',
             headers:{
                 'Content-Type':'application/json',
+                'authorization': 'Token ' + this.getToken()
             },
             body: JSON.stringify({
                 start_station: start_station,
                 end_station: end_station,
                 price: price,
                 date: date,
-                token: this.getToken()
+                
             })
         })
         .then(res => res.json());
     },
 
     async getUserData() {
-        return fetch(url + '/users/' + this.getUserId())
+        return fetch(url + 'users/' + this.getUserId(), {
+            method: 'GET',
+            headers:{
+                'authorization': 'Token ' + this.getToken()
+            }
+        })
         .then(res => res.json())
+    },
+
+    async deleteUser() {
+        return fetch(url + 'users/' + this.getUserId() + '/deleteAccount', {
+            method: 'DELETE',
+            headers:{
+                'authorization': 'Token ' + this.getToken()
+            }
+        })
     }
 }
