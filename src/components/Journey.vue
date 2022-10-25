@@ -9,12 +9,15 @@ moment.locale('fr')
 const router = useRouter()
 const route = useRoute()
 let error = false
+let is_auth = data.is_auth()
 
 let props = defineProps({
     journey: {
         default: null
     }
 })
+
+
 
 async function addTicket() {
 
@@ -75,7 +78,7 @@ async function addTicket() {
             </div>
 
         </div>
-        <div class="reservation">
+        <div v-if="is_auth" class="reservation">
             <button class="submitButton" @click="addTicket">Réserver</button>
         </div>
 
