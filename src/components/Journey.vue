@@ -2,10 +2,12 @@
 import moment from 'moment'
 import data from '../assets/data'
 import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 moment.locale('fr')
 
-let notReserved = true
+const router = useRouter()
+const route = useRoute()
 let error = false
 
 let props = defineProps({
@@ -14,7 +16,7 @@ let props = defineProps({
     }
 })
 
-function addTicket() {
+async function addTicket() {
 
     let start_station = ''
     let end_station = ''
@@ -30,14 +32,13 @@ function addTicket() {
 
     let date = moment(props.journey.departure_date_time).format('DD/MM/YYYY').toString() + " " + moment(props.journey.departure_date_time).format('HH:mm').toString()
 
-    data.addTicket(start_station, end_station, 11.50, date)
-    .then(res => {
-        notReserved = false
-    })
+    await data.addTicket(start_station, end_station, 11.50, date)
     .catch(e => {
         error = true
+    });
+    router.push({
+        name:'Account'
     })
-    ;
 }
 
 
@@ -75,9 +76,7 @@ function addTicket() {
 
         </div>
         <div class="reservation">
-            <button v-if="notReserved" class="submitButton" @click="addTicket">Réserver</button>
-            <p v-else>Réservé</p>
-            <p v-if="error" class="errMsg">Une erreur a eu lieu</p>
+            <button class="submitButton" @click="addTicket">Réserver</button>
         </div>
 
     </div>
@@ -97,8 +96,8 @@ function addTicket() {
 .reservation{
     display: flex;
     align-items: center;
-
     margin-right: 50px;
+    margin-left: 50px;
     height: auto;
 }
 .submitButton{

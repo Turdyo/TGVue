@@ -7,7 +7,7 @@
             <RouterLink v-if="!account_page" to="/account">
                 <img src="https://cdn-icons-png.flaticon.com/512/5195/5195775.png" alt="Profil" class="profileIcon">
             </RouterLink>
-            <h2 @click="logout">Déconnexion</h2>
+            <button @click="logout">Déconnexion</button>
         </div>
         <div v-else class="header_usage">
             <RouterLink v-if="!login_page" to="/login">
@@ -40,8 +40,10 @@ export default {
             this.$cookies.remove('id')
             this.$cookies.remove('auth_token')
             this.$router.push({
-                name: 'Home'
+                name:'Home'
             })
+            window.location.reload()
+            
         }
     }
 }
