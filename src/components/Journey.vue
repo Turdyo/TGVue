@@ -1,14 +1,44 @@
 <script setup>
 import moment from 'moment'
+import data from '../assets/data'
 import { ref } from 'vue'
 
 moment.locale('fr')
+
+let notReserved = true
+let error = false
 
 let props = defineProps({
     journey: {
         default: null
     }
 })
+
+function addTicket() {
+
+    let start_station = ''
+    let end_station = ''
+
+    let stations = props.journey.sections.filter(section => section.type === "public_transport")
+
+    let count = 0;
+    stations.forEach((section) => {
+        if (count === 0) start_station = section.from.name;
+        if (count === stations.length - 1) end_station = section.to.name;
+        count++;
+    })
+
+    let date = moment(props.journey.departure_date_time).format('DD/MM/YYYY').toString() + " " + moment(props.journey.departure_date_time).format('HH:mm').toString()
+
+    data.addTicket(start_station, end_station, 11.50, date)
+    .then(res => {
+        notReserved = false
+    })
+    .catch(e => {
+        error = true
+    })
+    ;
+}
 
 
 </script>
@@ -38,7 +68,6 @@ let props = defineProps({
                     <div v-else>
                         <img src="https://cdn-icons-png.flaticon.com/512/2855/2855692.png" alt="Train" class="waitingIcon">
                         {{moment.utc(new Date(section.duration * 1000)).format("HH:mm")}}&nbsp;{{section.from.name}} to {{section.to.name}}
-        
                     </div>
                 </div>
     
@@ -46,7 +75,9 @@ let props = defineProps({
 
         </div>
         <div class="reservation">
-            <button class="submitButton">Réserver</button>
+            <button v-if="notReserved" class="submitButton" @click="addTicket">Réserver</button>
+            <p v-else>Réservé</p>
+            <p v-if="error" class="errMsg">Une erreur a eu lieu</p>
         </div>
 
     </div>

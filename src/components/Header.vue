@@ -4,7 +4,7 @@
             <img src="https://media.discordapp.net/attachments/1024274664220020796/1031890537810239529/TGVue_logo_Blanc.png" alt="TGVue logo">
         </RouterLink>
         <div v-if="is_auth" class="header_usage">
-            <RouterLink v-if="account_page" to="/account" class="accountLink">
+            <RouterLink v-if="!account_page" to="/account">
                 <img src="https://cdn-icons-png.flaticon.com/512/5195/5195775.png" alt="Profil" class="profileIcon">
             </RouterLink>
             <h2 @click="logout">Déconnexion</h2>
@@ -34,6 +34,15 @@ export default {
     },
     created() {
         this.is_auth = data.is_auth()
+    },
+    methods: {
+        logout() {
+            this.$cookies.remove('id')
+            this.$cookies.remove('auth_token')
+            this.$router.push({
+                name: 'Home'
+            })
+        }
     }
 }
 </script>
@@ -68,7 +77,7 @@ h1{
     display: flex;
     justify-content:space-evenly;
     align-items: center;
-    width: 15%;
+    width: 30%;
     padding-right: 50px;
 }
 

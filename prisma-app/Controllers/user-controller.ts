@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { getToken } from './auth-controller';
 
 const jwt = require('jsonwebtoken');
 const prisma = new PrismaClient();
@@ -9,7 +8,7 @@ export const getUserData = (req: any, res: any) => {
   
     res.setHeader('content-type', 'application/json')
 
-    const token = getToken(req);
+    const token = req.body.token;
     if(token !== null && jwt.verify(token, process.env.SECRET)) {
       prisma.user.findUnique({
         where:{
@@ -44,7 +43,7 @@ export const setNewPassword = (req: any, res: any) => {
   
     res.setHeader('content-type', 'application/json')
 
-    const token = getToken(req);
+    const token = req.body.token;
     if(token !== null && jwt.verify(token, process.env.SECRET)) {
         prisma.user.update({
             where: {
@@ -67,7 +66,7 @@ export const addTicketToUser = (req: any, res: any) => {
     const { id } = req.params;
     const body = req.body;
   
-    const token = getToken(req);
+    const token = body.token;
     if(token !== null && jwt.verify(token, process.env.SECRET)) {
         prisma.ticket.create({
           data:{
@@ -92,7 +91,7 @@ export const deleteAccount = async (req: any, res: any) => {
   
     let deleteTicket = true;
   
-    const token = getToken(req);
+    const token = req.body.token;
     if(token !== null && jwt.verify(token, process.env.SECRET)) {
         await prisma.ticket.deleteMany({
           where:{

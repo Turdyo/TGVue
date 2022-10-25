@@ -61,4 +61,36 @@ export default {
         }
         return null
     },
+
+    getUserId() {
+        if(this.is_auth()) {
+            let cookies = document.cookie.split(";")
+            let id = null
+            cookies.forEach(value => {
+                if(value.match("id") != null) {
+                    id = value.split('=')[1]
+                }
+            })
+    
+            return id
+        }
+        return null
+    },
+
+    async addTicket(start_station, end_station, price, date) {
+        return fetch(url + '/users/' + this.getUserId() + '/addTicket', {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json',
+            },
+            body: JSON.stringify({
+                start_station: start_station,
+                end_station: end_station,
+                price: price,
+                date: date,
+                token: this.getToken()
+            })
+        })
+        .then(res => res.json());
+    }
 }
