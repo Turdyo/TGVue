@@ -57,7 +57,7 @@ function handleAutoComplete(value) {
 
 </template>
 
-<style scoped>
+<style>
 input:focus{
     box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     transition: box-shadow 0.2s ease-in-out;
@@ -73,7 +73,7 @@ input:focus{
     border: 1px solid grey;
 }
 
-.gareInput {
+input {
     padding: 15px;
     border-radius: 5px;
     border: none;
