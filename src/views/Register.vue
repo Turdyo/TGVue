@@ -18,6 +18,12 @@ export default {
             errorPass2 : ""
         }
     },
+    created() {
+        if (data.is_auth()) 
+            this.$router.push({
+                name:'Home'
+            })
+    },
     methods:{
         register() {
             this.errorEmail = "";
@@ -66,10 +72,13 @@ export default {
             if (!hasError) {
                 data.createAccount(this.email, this.lastName, this.firstName, this.password1)
                 .then(answer => {
-                    console.log(answer);
-                })
+                    this.$cookies.set('auth_token', answer.token, 84600);
+                    this.$cookies.set('id', answer.id, 84600);
+                    this.$router.push({
+                        name:'Home'
+                    });
+                });
             }
-            
         }
     },
     components:{
@@ -80,24 +89,22 @@ export default {
 </script>
 
 <template>
-    <div>
-        <HeaderVue></HeaderVue>
-        <div class="container">
-            <div class="authForm">
-                <h1>Inscription</h1>
-                <input type="text" v-model="email" placeholder="Email">
-                <p v-if="errorEmail!==''" class="errMsg">{{errorEmail}}</p>
-                <input type="text" v-model="lastName" placeholder="Nom">
-                <p v-if="errorlName!==''" class="errMsg">{{errorlName}}</p>
-                <input type="text" v-model="firstName" placeholder="Prénom">
-                <p v-if="errorfName!==''" class="errMsg">{{errorfName}}</p>
-                <input type="text" v-model="password1" placeholder="Mot de passe">
-                <p v-if="errorPass1!==''" class="errMsg">{{errorPass1}}</p>
-                <input type="text" v-model="password2" placeholder="Confirmez votre mot de passe">
-                <p v-if="errorPass2!==''" class="errMsg">{{errorPass2}}</p>
-                <p v-else id="passInfo">8 charactères minimum</p>
-                <button class="submitButton" @click="register()">S'inscrire</button>
-            </div>
+    <HeaderVue :auth_page="true"></HeaderVue>
+    <div class="container">
+        <div class="authForm">
+            <h1>Inscription</h1>
+            <input type="text" v-model="email" placeholder="Email">
+            <p v-if="errorEmail!==''" class="errMsg">{{errorEmail}}</p>
+            <input type="text" v-model="lastName" placeholder="Nom">
+            <p v-if="errorlName!==''" class="errMsg">{{errorlName}}</p>
+            <input type="text" v-model="firstName" placeholder="Prénom">
+            <p v-if="errorfName!==''" class="errMsg">{{errorfName}}</p>
+            <input type="password" v-model="password1" placeholder="Mot de passe">
+            <p v-if="errorPass1!==''" class="errMsg">{{errorPass1}}</p>
+            <input type="password" v-model="password2" placeholder="Confirmez votre mot de passe">
+            <p v-if="errorPass2!==''" class="errMsg">{{errorPass2}}</p>
+            <p v-else id="passInfo">8 charactères minimum</p>
+            <button class="submitButton" @click="register">S'inscrire</button>
         </div>
     </div>
 </template>
@@ -106,6 +113,7 @@ export default {
 .container {
     display: flex;
     justify-content: center;
+    width: 100vw;
 }
 
 .errMsg {
@@ -122,6 +130,11 @@ export default {
 
 .authForm input {
     margin-top: 20px;
+}
+
+.authForm .submitButton {
+    width: 150px;
+    align-self: center;
 }
 
 #passInfo {

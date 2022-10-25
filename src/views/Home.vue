@@ -5,7 +5,7 @@
 
 <template>
     <Header></Header>
-    <Suspense>
+    <Suspense id="container">
         <Recherche></Recherche>
         <template #fallback>
             <div style="text-align:center; font-size: larger">
@@ -35,6 +35,12 @@
 	animation-iteration-count: 1;
 	animation-timing-function: ease-in;
 	animation-duration: 0.2s;
+}
+
+#container {
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
 @keyframes fadeInOpacity {

@@ -126,11 +126,14 @@ async function nextDeparture(precedent) {
 .mainContainer{
     display: flex;
     flex-direction: column;
+    align-items: center;
+    width: 100vw;
 }
 .mainForm{
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 70%;
 }
 .mainFormContainer{
     display: flex;

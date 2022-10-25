@@ -17,7 +17,7 @@ app.delete('/api/users/:id/deleteAccount', (req, res) => deleteAccount(req, res)
 
 app.post('/api/auth/createUser', (req, res) => createNewAccount(req, res))
 
-app.get('/api/auth/login', async (req, res) => login(req, res))
+app.post('/api/auth/login', async (req, res) => login(req, res))
 
 app.listen(3000, () =>
   console.log(`
