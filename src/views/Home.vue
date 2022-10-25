@@ -5,10 +5,10 @@
 
 <template>
     <Header></Header>
-    <Suspense id="container">
+    <Suspense>
         <Recherche></Recherche>
         <template #fallback>
-            <div style="text-align:center; font-size: larger">
+            <div class="container">
                 <img src="https://cdn.dribbble.com/users/1305855/screenshots/5945198/loading_800-600.gif"
                     class="loadingImg fade-in">
             </div>
@@ -37,7 +37,7 @@
 	animation-duration: 0.2s;
 }
 
-#container {
+.container {
     display: flex;
     align-items: center;
     width: 100%;

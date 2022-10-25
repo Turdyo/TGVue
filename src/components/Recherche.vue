@@ -120,7 +120,7 @@ async function nextDeparture(precedent) {
 }
 
 .loadingImgRecherche{
-    width: 300px;
+    width: 300px !important;
 }
 
 .mainContainer{

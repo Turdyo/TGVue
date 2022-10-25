@@ -67,7 +67,7 @@ export default {
     height: auto;
     margin-bottom: 50px;
     width: 100vw;
-    justify-content: space-between;
+    justify-content: center;
     padding-top: 15px;
 }
 h1{
@@ -76,11 +76,13 @@ h1{
 
 
 .header_usage {
+    position: absolute;
+    right: 0;
     display: flex;
     justify-content:space-evenly;
     align-items: center;
     width: 30%;
-    padding-right: 50px;
+    /* padding-right: 50px; */
 }
 
 img{
